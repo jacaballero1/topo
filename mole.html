@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whac a Mole</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            background: url("./mario-bg.jpg");
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #board {
+            width: 90vw; /* Usamos vw para que el tablero ocupe el 90% del ancho de la ventana */
+            max-width: 540px; /* Establecemos un máximo para que no se expanda demasiado */
+            height: 90vw; /* Igualamos el alto al ancho para mantenerlo cuadrado */
+            max-height: 540px; /* Igualamos el máximo al ancho máximo */
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columnas de tamaño igual */
+            grid-template-rows: repeat(3, 1fr); /* 3 filas de tamaño igual */
+            gap: 10px; /* Espacio entre los cuadros */
+            border: 3px solid white;
+            border-radius: 25px;
+            background: url("./soil.png");
+            background-size: cover;
+        }
+
+        #board div {
+            position: relative; /* Para posicionar correctamente las imágenes internas */
+            overflow: hidden; /* Para evitar que las imágenes salgan del contenedor */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url("./pipe.png");
+            background-size: contain; /* Ajustamos el tamaño de la imagen del tubo para que quepa */
+            background-repeat: no-repeat;
+            cursor: pointer; /* Cambia el cursor al pasar por encima */
+        }
+
+        #board div img {
+            width: 80%; /* Limitamos el tamaño máximo de las imágenes al 80% del contenedor */
+            height: auto; /* Mantenemos la proporción */
+            position: absolute; /* Para poder posicionar con respecto al contenedor */
+            bottom: -100%; /* Posición inicial, fuera de la vista */
+            left: 50%; /* Centramos horizontalmente */
+            transform: translateX(-50%); /* Centramos horizontalmente con respecto al padre */
+            transition: bottom 0.5s ease-in-out; /* Animación suave al mover hacia abajo y luego hacia arriba */
+            pointer-events: none; /* Evitamos que las imágenes afecten a los eventos de clic */
+        }
+
+        @keyframes popUp {
+            0% {
+                bottom: -100%; /* Comienza fuera de la vista */
+            }
+            100% {
+                bottom: 0; /* Vuelve a la posición inicial */
+            }
+        }
+
+        @keyframes popDown {
+            0% {
+                bottom: 0; /* Comienza en la posición inicial */
+            }
+            100% {
+                bottom: -100%; /* Fuera de la vista */
+            }
+        }
+
+        #board div.pop-up img {
+            animation: popUp 1s ease-in-out; /* Aplica la animación de aparecer */
+        }
+
+        #board div.pop-down img {
+            animation: popDown 1s ease-in-out; /* Aplica la animación de desaparecer */
+        }
+
+        h1, h2 {
+            color: white;
+        }
+
+        #score {
+            color: white;
+            font-size: 24px;
+        }
+    </style>
+    <script>
+        let currTile;
+        let score = 0;
+        let gameOver = false;
+
+        window.onload = function() {
+            setGame();
+        }
+
+        function setGame() {
+            // Set up the grid in HTML
+            for (let i = 0; i < 9; i++) {
+                let tile = document.createElement("div");
+                tile.id = i.toString();
+                tile.addEventListener("click", selectTile);
+                document.getElementById("board").appendChild(tile);
+            }
+            setInterval(setTile, 2000); // Every 2 seconds call setTile
+        }
+
+        function getRandomTile() {
+            let num = Math.floor(Math.random() * 9);
+            return num.toString();
+        }
+
+        function getRandomImage() {
+            return Math.random() < 0.5 ? "./monty-mole.png" : "./piranha-plant.png";
+        }
+
+        function setTile() {
+            if (gameOver) {
+                return;
+            }
+            if (currTile) {
+                currTile.innerHTML = "";
+                currTile.classList.remove("pop-down");
+            }
+            let imgSrc = getRandomImage();
+            let img = document.createElement("img");
+            img.src = imgSrc;
+            img.classList.add("game-item");
+
+            let num = getRandomTile();
+            currTile = document.getElementById(num);
+            currTile.appendChild(img);
+            currTile.classList.add("pop-up");
+            img.style.bottom = "-100%";
+            setTimeout(() => {
+                currTile.classList.remove("pop-up");
+                img.style.bottom = "0";
+            }, 1000);
+        }
+
+        function selectTile() {
+            if (gameOver) {
+                return;
+            }
+            if (this.querySelector("img") && this.querySelector("img").src.includes("piranha-plant.png")) {
+                document.getElementById("score").innerText = "GAME OVER: " + score.toString();
+                gameOver = true;
+            } else if (this.querySelector("img") && this.querySelector("img").src.includes("monty-mole.png")) {
+                score += 10;
+                document.getElementById("score").innerText = score.toString();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <h1>Whac a Mole</h1>
+        <h2 id="score">0</h2>
+        <!-- 3x3 -->
+        <div id="board">
+        </div>
+    </div>
+</body>
+</html>
