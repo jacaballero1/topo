@@ -85,7 +85,7 @@ function selectTile() {
         document.getElementById("score").innerText = score.toString(); // Update score HTML
     }
     else if (this == currPlantTile) {
-        document.getElementById("score").innerText = "GAME OVER: " + score.toString(); // Update score HTML
+        document.getElementById("score").innerText = "LO SIENTO PERDISTE!: " + score.toString(); // Update score HTML
         gameOver = true;
     }
 }
