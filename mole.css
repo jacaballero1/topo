@@ -40,7 +40,7 @@
             background-image: url("./pipe.png");
             background-size: contain; /* Ajustamos el tamaño de la imagen del tubo para que quepa */
             background-repeat: no-repeat;
-            cursor: pointer; /* Cambia el cursor al pasar por encima */
+            //cursor: pointer; /* Cambia el cursor al pasar por encima */
         }
 
         #board div img {
