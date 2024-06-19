@@ -80,12 +80,41 @@ function selectTile() {
     if (gameOver) {
         return;
     }
-    if (this == currMoleTile) {
-        score += 10;
-        document.getElementById("score").innerText = score.toString(); // Update score HTML
-    }
-    else if (this == currPlantTile) {
-        document.getElementById("score").innerText = "LO SIENTO PERDISTE!: " + score.toString(); // Update score HTML
+    // if (this == currMoleTile) {
+    //     score += 10;
+    //     document.getElementById("score").innerText = score.toString(); // Update score HTML
+    // }
+    // else if (this == currPlantTile) {
+    //     document.getElementById("score").innerText = "GAME OVER: " + score.toString(); // Update score HTML
+    //     gameOver = true;
+    //     createRestartButton(); // Create the restart button    
+    // }
+
+    if (this.querySelector("img") && this.querySelector("img").src.includes("piranha-plant.png")) {
+        document.getElementById("score").innerText = "GAME OVER: " + score.toString();
         gameOver = true;
+        createRestartButton(); // Create the restart button        
+    } else if (this.querySelector("img") && this.querySelector("img").src.includes("monty-mole.png")) {
+        score += 10;
+        document.getElementById("score").innerText = score.toString();
     }
 }
+//Agrega boton reiniciar
+function createRestartButton() {
+    let restartButton = document.createElement("button");
+    restartButton.id = "restart-button";
+    restartButton.textContent = "Reiniciar";
+    document.getElementById("container").appendChild(restartButton);
+    restartButton.addEventListener("click", restartGame);
+}
+
+function restartGame() {
+    gameOver = false;
+    score = 0;
+    document.getElementById("score").innerText = "0";
+    document.getElementById("restart-button").remove(); // Remove the restart button
+    tile.remove();
+    //location.reload();
+    setGame(); // Restart the game
+}
+//Fin Reiniciar
