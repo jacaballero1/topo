@@ -75,21 +75,10 @@ function setPlant() {
         plant.style.bottom = "0"; 
     }, 1000);
 }
-
 function selectTile() {
     if (gameOver) {
         return;
     }
-    // if (this == currMoleTile) {
-    //     score += 10;
-    //     document.getElementById("score").innerText = score.toString(); // Update score HTML
-    // }
-    // else if (this == currPlantTile) {
-    //     document.getElementById("score").innerText = "GAME OVER: " + score.toString(); // Update score HTML
-    //     gameOver = true;
-    //     createRestartButton(); // Create the restart button    
-    // }
-
     if (this.querySelector("img") && this.querySelector("img").src.includes("piranha-plant.png")) {
         document.getElementById("score").innerText = "GAME OVER: " + score.toString();
         gameOver = true;
@@ -97,8 +86,33 @@ function selectTile() {
     } else if (this.querySelector("img") && this.querySelector("img").src.includes("monty-mole.png")) {
         score += 10;
         document.getElementById("score").innerText = score.toString();
+        let mole = this.querySelector("img");
+        mole.src = "topo golpeado.png"; // Reemplazar la imagen
     }
 }
+// function selectTile() {
+//     if (gameOver) {
+//         return;
+//     }
+//     // if (this == currMoleTile) {
+//     //     score += 10;
+//     //     document.getElementById("score").innerText = score.toString(); // Update score HTML
+//     // }
+//     // else if (this == currPlantTile) {
+//     //     document.getElementById("score").innerText = "GAME OVER: " + score.toString(); // Update score HTML
+//     //     gameOver = true;
+//     //     createRestartButton(); // Create the restart button    
+//     // }
+
+//     if (this.querySelector("img") && this.querySelector("img").src.includes("piranha-plant.png")) {
+//         document.getElementById("score").innerText = "GAME OVER: " + score.toString();
+//         gameOver = true;
+//         createRestartButton(); // Create the restart button        
+//     } else if (this.querySelector("img") && this.querySelector("img").src.includes("monty-mole.png")) {
+//         score += 10;
+//         document.getElementById("score").innerText = score.toString();
+//     }
+// }
 //Agrega boton reiniciar
 function createRestartButton() {
     let restartButton = document.createElement("button");
