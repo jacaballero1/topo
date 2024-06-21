@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego - Golpea al Topo</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            background: url("./mario-bg.jpg");
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #score {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #board {
+            display: grid;
+            gap: 10px;
+            border: 3px solid white;
+            border-radius: 25px;
+            background: url("./soil.png");
+            background-size: cover;
+            margin: 20px auto;
+            width: 90vw;
+            max-width: 540px;
+            height: 90vw;
+            max-height: 540px;
+            grid-template-columns: repeat(3, 1fr); /* Valor por defecto */
+            grid-template-rows: repeat(3, 1fr); /* Valor por defecto */
+        }
+
+        #board div {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url("./pipe.png");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        #board div img {
+            width: 80%;
+            height: auto;
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+    </style>
+    <script>
+        let numRows = localStorage.getItem('numRows') || 3;
+        let numColumns = localStorage.getItem('numColumns') || 3;
+        let score = 0;
+        let gameOver = false;
+        let currMoleTile;
+        let currPlantTile;
+
+        window.onload = function() {
+            const board = document.getElementById("board");
+
+            board.style.gridTemplateColumns = `repeat(${numColumns}, 1fr)`;
+            board.style.gridTemplateRows = `repeat(${numRows}, 1fr)`;
+
+            for (let i = 0; i < numRows; i++) {
+                for (let j = 0; j < numColumns; j++) {
+                    let tile = document.createElement("div");
+                    tile.id = `${i}-${j}`;
+                    tile.classList.add("empty");
+                    tile.addEventListener("click", selectTile);
+                    board.appendChild(tile);
+                }
+            }
+
+            setInterval(setMole, 2000);
+            setInterval(setPlant, 1700);
+        }
+
+        function getRandomTile() {
+            let emptyTiles = Array.from(document.querySelectorAll("#board div.empty"));
+            if (emptyTiles.length === 0) {
+                return null; // No hay casillas vacías
+            }
+            let randomIndex = Math.floor(Math.random() * emptyTiles.length);
+            return emptyTiles[randomIndex].id;
+        }
+
+        function setMole() {
+            if (gameOver) {
+                return;
+            }
+            if (currMoleTile) {
+                currMoleTile.innerHTML = "";
+                currMoleTile.classList.remove("pop-down");
+            }
+            let mole = document.createElement("img");
+            mole.src = "./monty-mole.png";
+            mole.classList.add("game-item");
+
+            let pos = getRandomTile();
+            if (!pos) {
+                return; // No hay casillas vacías para colocar al topo
+            }
+            currMoleTile = document.getElementById(pos);
+            currMoleTile.appendChild(mole);
+            currMoleTile.classList.add("pop-up");
+            mole.style.bottom = "-100%"; // Start position
+            setTimeout(() => {
+                currMoleTile.classList.remove("pop-up");
+                mole.style.bottom = "0"; // End position
+            }, 1000);
+        }
+
+        function setPlant() {
+            if (gameOver) {
+                return;
+            }
+            if (currPlantTile) {
+                currPlantTile.innerHTML = "";
+                currPlantTile.classList.remove("pop-down");
+            }
+            let plant = document.createElement("img");
+            plant.src = "./piranha-plant.png";
+            plant.classList.add("game-item");
+
+            let pos = getRandomTile();
+            if (!pos) {
+                return; // No hay casillas vacías para colocar la planta
+            }
+            currPlantTile = document.getElementById(pos);
+            currPlantTile.appendChild(plant);
+            currPlantTile.classList.add("pop-up");
+            plant.style.bottom = "-100%"; // Start position
+            setTimeout(() => {
+                currPlantTile.classList.remove("pop-up");
+                plant.style.bottom = "0"; // End position
+            }, 1000);
+        }
+
+        function selectTile() {
+            if (gameOver) {
+                return;
+            }
+            if (this.querySelector("img") && this.querySelector("img").src.includes("piranha-plant.png")) {
+                document.getElementById("score").innerText = "PERDISTE! " + score.toString();
+                gameOver = true;
+                createRestartButton(); // Crear el botón de reinicio
+            } else if (this.querySelector("img") && this.querySelector("img").src.includes("monty-mole.png")) {
+                score += 10;
+                document.getElementById("score").innerText = score.toString();
+                let mole = this.querySelector("img");
+                mole.src = "./topo golpeado.png"; // Reemplazar la imagen
+            }
+        }
+
+        function createRestartButton() {
+            let restartButton = document.createElement("button");
+            restartButton.innerText = "Reiniciar Juego";
+            restartButton.addEventListener("click", restartGame);
+            document.getElementById("container").appendChild(restartButton);
+        }
+
+        function restartGame() {
+            score = 0;
+            gameOver = false;
+            document.getElementById("score").innerText = "0";
+            document.querySelectorAll(".game-item").forEach(item => item.parentNode.removeChild(item));
+            currMoleTile = null;
+            currPlantTile = null;
+            document.getElementById("restart-button").style.display = "none";
+            setMole();
+            setPlant();
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <h1>Golpea al Topo</h1>
+        <h2 id="score">0</h2>
+        <div id="board">
+            <!-- El tablero se generará dinámicamente aquí -->
+        </div>
+        <button id="restart-button" style="display: none;">Reiniciar</button>
+    </div>
+</body>
+</html>
